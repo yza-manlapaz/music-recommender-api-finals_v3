@@ -1,0 +1,87 @@
+{
+  "model_type": "genre-aware content-based recommender",
+  "continuous_features": [
+    "danceability",
+    "energy",
+    "loudness",
+    "speechiness",
+    "acousticness",
+    "instrumentalness",
+    "liveness",
+    "valence",
+    "tempo"
+  ],
+  "distance_metric": "euclidean",
+  "weights": {
+    "key_weight": 0.05,
+    "mode_weight": 0.05,
+    "popularity_weight": 0.3
+  },
+  "duplicate_filter": {
+    "same_artist_and_title": true,
+    "case_insensitive": true,
+    "strip_whitespace": true
+  },
+  "genre_families": {
+    "pop": [
+      "cantopop",
+      "dance",
+      "indie-pop",
+      "k-pop",
+      "pop",
+      "power-pop",
+      "singer-songwriter",
+      "songwriter"
+    ],
+    "rock": [
+      "alt-rock",
+      "garage",
+      "hard-rock",
+      "psych-rock",
+      "punk-rock",
+      "rock",
+      "rock-n-roll"
+    ],
+    "electronic": [
+      "breakbeat",
+      "chicago-house",
+      "club",
+      "deep-house",
+      "detroit-techno",
+      "drum-and-bass",
+      "dubstep",
+      "edm",
+      "electro",
+      "electronic",
+      "house",
+      "minimal-techno",
+      "progressive-house",
+      "techno",
+      "trance"
+    ],
+    "metal": [
+      "black-metal",
+      "death-metal",
+      "grindcore",
+      "hardcore",
+      "heavy-metal",
+      "metal",
+      "metalcore"
+    ],
+    "acoustic": [
+      "acoustic",
+      "folk",
+      "guitar",
+      "piano",
+      "singer-songwriter",
+      "songwriter"
+    ],
+    "soul": [
+      "blues",
+      "funk",
+      "gospel",
+      "jazz",
+      "soul"
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Django
+backend/db.sqlite3
+backend/media/
+*.log
+
+# =========================
+# Recommender Model artifacts
+# =========================
+backend/models/content_based/*.pkl
+backend/models/content_based/*.npy
+
+# Keep model configuration
+!backend/models/content_based/model_config.json
+
+# =========================
+# Node / React / Vite
+# =========================
+frontend/node_modules/
+frontend/dist/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# =========================
+# IDE
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
