@@ -9,7 +9,11 @@ from drf_spectacular.utils import (
     OpenApiResponse,
 )
 
-from recommender.runtime_recommend import runtime_recommend
+from recommender.runtime_recommend import ( 
+    runtime_recommend,
+    runtime_recommend_batch,
+)
+
 from recommender.load import runtime_metadata
 
 @extend_schema(
@@ -70,6 +74,130 @@ def recommend_song(request, track_id):
 
     return Response({
         "query_track_id": track_id,
+        "recommendations": recommendations,
+    })
+
+
+@extend_schema(
+    summary="Recommend songs from multiple selections",
+    description=(
+        "Accepts between 1 and 10 Spotify track IDs and returns "
+        "10 recommendations based on the combined audio profile "
+        "of the selected songs."
+    ),
+    request={
+        "application/json": {
+            "type": "object",
+            "properties": {
+                "track_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                    },
+                    "minItems": 1,
+                    "maxItems": 10,
+                    "description": (
+                        "Spotify track IDs of the selected songs."
+                    ),
+                }
+            },
+            "required": ["track_ids"],
+        }
+    },
+    responses={
+        200: OpenApiResponse(
+            description="Recommendations returned successfully."
+        ),
+        400: OpenApiResponse(
+            description="Invalid number or format of track IDs."
+        ),
+        404: OpenApiResponse(
+            description="One or more track IDs were not found."
+        ),
+    },
+)
+@api_view(["POST"])
+def recommend_batch(request):
+
+    track_ids = request.data.get("track_ids")
+
+    # track_ids must be a list
+    if not isinstance(track_ids, list):
+        return Response(
+            {
+                "detail": "track_ids must be a list."
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # require between 1 and 10 songs
+    if len(track_ids) < 1 or len(track_ids) > 10:
+        return Response(
+            {
+                "detail": (
+                    "Please select between 1 and 10 songs."
+                )
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # remove duplicate track IDs
+    track_ids = list(dict.fromkeys(track_ids))
+
+    # verify every track exists
+    selected_tracks = []
+
+    for track_id in track_ids:
+
+        matches = runtime_metadata[
+            runtime_metadata["track_id"] == track_id
+        ]
+
+        if matches.empty:
+            return Response(
+                {
+                    "detail": (
+                        f"Track not found: {track_id}"
+                    )
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        row = matches.iloc[0]
+
+        selected_tracks.append({
+            "track_id": row["track_id"],
+            "track_name": row["track_name"],
+            "artist_name": row["artist_name"],
+            "genre": row["genre"],
+            "popularity": int(row["popularity"]),
+        })
+
+    # generate recommendations
+    results = runtime_recommend_batch(
+        track_ids=track_ids,
+        top_n=10,
+    )
+
+    recommendations = []
+
+    for _, row in results.iterrows():
+        recommendations.append({
+            "track_id": row["track_id"],
+            "track_name": row["track_name"],
+            "artist_name": row["artist_name"],
+            "genre": row["genre"],
+            "popularity": int(row["popularity"]),
+            "audio_distance": float(
+                row["audio_distance"]
+            ),
+            "final_score": float(
+                row["final_score"]
+            ),
+        })
+
+    return Response({
+        "selected_tracks": selected_tracks,
         "recommendations": recommendations,
     })
 

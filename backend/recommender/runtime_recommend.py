@@ -206,3 +206,131 @@ def runtime_recommend(track_id, top_n=10):
     )
 
     return results
+
+
+def runtime_recommend_batch(track_ids, top_n=10):
+
+    # only accept between 1 and 10 selected songs
+    if not track_ids or len(track_ids) > 10:
+        return None
+
+    # convert track IDs into row indices
+    selected_indices = []
+
+    for track_id in track_ids:
+        song_idx = runtime_track_lookup.get(track_id)
+
+        if song_idx is None:
+            return None
+
+        selected_indices.append(song_idx)
+
+    # remove duplicate selections while preserving order
+    selected_indices = list(dict.fromkeys(selected_indices))
+
+    # get the standardized audio vectors of selected songs
+    selected_vectors = runtime_X[selected_indices]
+
+    # create one combined preference vector
+    query_vector = np.mean(
+        selected_vectors,
+        axis=0,
+    )
+
+    # collect genres compatible with ALL selected songs
+    compatible_genres = set()
+
+    for song_idx in selected_indices:
+
+        query_genre = runtime_metadata.iloc[song_idx]["genre"]
+
+        compatible_genres.add(query_genre)
+
+        for genres in runtime_genre_families.values():
+            if query_genre in genres:
+                compatible_genres.update(genres)
+
+    # get candidate songs belonging to compatible genres
+    genre_array = runtime_metadata["genre"].to_numpy()
+
+    candidate_indices = np.flatnonzero(
+        np.isin(
+            genre_array,
+            list(compatible_genres),
+        )
+    )
+
+    # remove every selected song from the candidates
+    candidate_indices = candidate_indices[
+        ~np.isin(
+            candidate_indices,
+            selected_indices,
+        )
+    ]
+
+    # calculate Euclidean distance from combined audio vector
+    candidate_vectors = runtime_X[
+        candidate_indices
+    ]
+
+    audio_distance = np.linalg.norm(
+        candidate_vectors - query_vector,
+        axis=1,
+    )
+
+    # get popularity
+    candidate_popularity = runtime_popularity[
+        candidate_indices
+    ]
+
+    # get popularity weight from configuration
+    popularity_weight = runtime_config[
+        "weights"
+    ]["popularity_weight"]
+
+    # final batch score
+    final_score = (
+        audio_distance
+        - popularity_weight * candidate_popularity
+    )
+
+    # determine number of recommendations
+    number_to_return = min(
+        top_n,
+        len(candidate_indices),
+    )
+
+    if number_to_return == 0:
+        return runtime_metadata.iloc[[]].copy()
+
+    # find songs with lowest final scores
+    top_positions = np.argpartition(
+        final_score,
+        number_to_return - 1,
+    )[:number_to_return]
+
+    # sort selected recommendations properly
+    top_positions = top_positions[
+        np.argsort(
+            final_score[top_positions]
+        )
+    ]
+
+    top_indices = candidate_indices[
+        top_positions
+    ]
+
+    # create result dataframe
+    results = runtime_metadata.iloc[
+        top_indices
+    ].copy()
+
+    results["audio_distance"] = (
+        audio_distance[top_positions]
+    )
+
+    results["final_score"] = (
+        final_score[top_positions]
+    )
+
+    return results

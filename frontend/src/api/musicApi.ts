@@ -31,19 +31,37 @@ export async function searchSongs(query: string): Promise<Song[]> {
 export interface Recommendation extends Song {
     audio_distance: number;
     final_score: number;
-  }
-  
-  interface RecommendationResponse {
-    query_track_id: string;
-    recommendations: Recommendation[];
-  }
-  
-  export async function getRecommendations(
-    trackId: string
-  ): Promise<Recommendation[]> {
-    const response = await axios.get<RecommendationResponse>(
-      `${API_BASE_URL}/recommend/${trackId}/`
-    );
-  
-    return response.data.recommendations;
-  }
+}
+
+interface RecommendationResponse {
+  query_track_id: string;
+  recommendations: Recommendation[];
+}
+
+export async function getRecommendations(
+  trackId: string
+): Promise<Recommendation[]> {
+  const response = await axios.get<RecommendationResponse>(
+    `${API_BASE_URL}/recommend/${trackId}/`
+  );
+
+  return response.data.recommendations;
+}
+
+export interface BatchRecommendationResponse {
+  selected_tracks: Song[];
+  recommendations: Recommendation[];
+}
+
+export async function getBatchRecommendations(
+  trackIds: string[]
+): Promise<BatchRecommendationResponse> {
+  const response = await axios.post<BatchRecommendationResponse>(
+    `${API_BASE_URL}/recommend/batch/`,
+    {
+      track_ids: trackIds,
+    }
+  );
+
+  return response.data;
+}
