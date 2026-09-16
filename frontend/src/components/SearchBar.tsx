@@ -23,15 +23,20 @@ import {
       <Paper
         elevation={0}
         sx={{
-          bgcolor: "#181818",
+          bgcolor: "#background.paper",
           borderRadius: 4,
           p: 3,
-          border: "1px solid #282828",
+          border: "1px solid",
+          borderColor: "divider",
         }}
       >
         <Typography
-          variant="h6"
-          sx={{ fontWeight: 700, mb: 2, color: "white" }}
+        variant="h6"
+        sx={{ 
+            fontWeight: 700, 
+            mb: 2, 
+            color: "text.primary" 
+        }}
         >
           Find your music
         </Typography>
@@ -39,7 +44,10 @@ import {
         <Box
           sx={{
             display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
+            flexDirection: { 
+                xs: "column", 
+                sm: "row" 
+            },
             gap: 2,
           }}
         >
@@ -52,25 +60,25 @@ import {
             }
             sx={{
               "& .MuiOutlinedInput-root": {
-                bgcolor: "#242424",
-                color: "white",
+                bgcolor: "#action.hover",
+                color: "text.primary",
                 borderRadius: 3,
   
                 "& fieldset": {
-                  borderColor: "#3a3a3a",
+                  borderColor: "divider",
                 },
   
                 "&:hover fieldset": {
-                  borderColor: "#666",
+                  borderColor: "text.secondary",
                 },
   
                 "&.Mui-focused fieldset": {
-                  borderColor: "#1ed760",
+                  borderColor: "primary.main",
                 },
               },
   
               "& input::placeholder": {
-                color: "#a7a7a7",
+                color: "text.secondary",
                 opacity: 1,
               },
             }}
@@ -82,15 +90,15 @@ import {
             disabled={loading}
             sx={{
               px: 4,
-              bgcolor: "#1ed760",
-              color: "#000",
+              bgcolor: "primary.main",
+              color: "primary.contrastText",
               fontWeight: 700,
               borderRadius: 3,
               textTransform: "none",
               minHeight: 48,
   
               "&:hover": {
-                bgcolor: "#1fdf64",
+                bgcolor: "primary.dark",
               },
             }}
           >

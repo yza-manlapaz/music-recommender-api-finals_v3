@@ -122,8 +122,8 @@ function App() {
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#0b0b0b",
-        color: "#ffffff",
+        bgcolor: "#background.default",
+        color: "text.primary",
         py: 6,
       }}
     >
