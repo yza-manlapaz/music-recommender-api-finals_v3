@@ -55,9 +55,12 @@ import {
             fullWidth
             placeholder="Search songs or artists..."
             value={query}
-            onChange={(event) =>
-              onQueryChange(event.target.value)
-            }
+            onChange={(event) => onQueryChange(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !loading) {
+                onSearch();
+              }
+            }}
             sx={{
               "& .MuiOutlinedInput-root": {
                 bgcolor: "#action.hover",
