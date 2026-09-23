@@ -29,8 +29,9 @@ import {
         sx={{
           mt: 3,
           p: 3,
-          bgcolor: "#181818",
-          border: "1px solid #282828",
+          bgcolor: "background.paper",
+          border: "1px solid",
+          borderColor: "divider",
           borderRadius: 4,
         }}
       >
@@ -39,14 +40,18 @@ import {
             variant="h6"
             sx={{
               fontWeight: 700,
-              color: "white",
+              color: "text.primary",
               mb: 1,
             }}
           >
             Recommended for You
           </Typography>
   
-          <Typography sx={{ color: "#a7a7a7" }}>
+          <Typography 
+            sx={{
+              color: "text.secondary"
+              }}
+            >
             Based on {selectedCount} selected{" "}
             {selectedCount === 1 ? "song" : "songs"}.
           </Typography>
@@ -62,12 +67,12 @@ import {
                 gap: 2,
                 p: 1.5,
                 mb: 1,
-                bgcolor: "#242424",
+                bgcolor: "action.hover",
                 borderRadius: 2,
                 transition: "background-color 0.2s",
   
                 "&:hover": {
-                  bgcolor: "#303030",
+                  bgcolor: "action.selected",
                 },
               }}
             >
@@ -75,7 +80,7 @@ import {
                 sx={{
                   width: 24,
                   textAlign: "center",
-                  color: "#a7a7a7",
+                  color: "text.secondary",
                   flexShrink: 0,
                 }}
               >
@@ -84,8 +89,8 @@ import {
   
               <Avatar
                 sx={{
-                  bgcolor: "#303030",
-                  color: "#1ed760",
+                  bgcolor: "background.paper",
+                  color: "primary.main",
                   width: 44,
                   height: 44,
                   flexShrink: 0,
@@ -100,13 +105,13 @@ import {
                 slotProps={{
                   primary: {
                     sx: {
-                      color: "white",
+                      color: "text.priamry",
                       fontWeight: 600,
                     },
                   },
                   secondary: {
                     sx: {
-                      color: "#a7a7a7",
+                      color: "text.secondary",
                     },
                   },
                 }}
@@ -125,8 +130,8 @@ import {
                   label={recommendation.genre}
                   size="small"
                   sx={{
-                    bgcolor: "#303030",
-                    color: "#d0d0d0",
+                    bgcolor: "background.paper",
+                    color: "text.secondary",
                     display: {
                       xs: "none",
                       sm: "inline-flex",
@@ -137,7 +142,7 @@ import {
                 <Typography
                   variant="caption"
                   sx={{
-                    color: "#a7a7a7",
+                    color: "text.secondary",
                     display: {
                       xs: "none",
                       md: "block",

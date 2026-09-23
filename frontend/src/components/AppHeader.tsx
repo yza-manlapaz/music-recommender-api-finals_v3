@@ -2,27 +2,35 @@ import { Box, Typography } from "@mui/material";
 
 function AppHeader() {
   return (
-    <Box sx={{ mb: 5 }}>
+    <Box
+      sx={{
+        textAlign: "center",
+        mb: 5,
+      }}
+    >
       <Typography
         variant="h3"
         sx={{
+          color: "text.primary",
           fontWeight: 800,
           letterSpacing: "-1px",
-          mb: 1,
+          mb: 1.5,
         }}
       >
-        Music Recommender
+        Music Recommendation API
       </Typography>
 
       <Typography
         sx={{
-          color: "#a7a7a7",
+          color: "text.secondary",
           fontSize: "1.05rem",
           maxWidth: 600,
+          mx: "auto",
+          lineHeight: 1.7,
         }}
       >
-        Discover songs based on the music you already enjoy.
-        Search and select up to 10 songs to get started.
+        This is an application that recommends songs based on what you selected.
+        Search and select up to 10 songs to get your recommendation.
       </Typography>
     </Box>
   );

@@ -34,8 +34,9 @@ import {
         sx={{
           mt: 3,
           p: 3,
-          bgcolor: "#181818",
-          border: "1px solid #282828",
+          bgcolor: "background.paper",
+          border: "1px solid",
+          borderColor: "divider",
           borderRadius: 4,
         }}
       >
@@ -52,7 +53,7 @@ import {
             variant="h6"
             sx={{
               fontWeight: 700,
-              color: "white",
+              color: "text.primary",
             }}
           >
             Your Playlist
@@ -62,8 +63,8 @@ import {
             label={`${songs.length}/10 songs`}
             size="small"
             sx={{
-              bgcolor: "#303030",
-              color: "#1ed760",
+              bgcolor: "action.hover",
+              color: "primary.main",
               fontWeight: 600,
             }}
           />
@@ -71,7 +72,7 @@ import {
   
         <Typography
           sx={{
-            color: "#a7a7a7",
+            color: "text.secondary",
             mb: 2,
           }}
         >
@@ -88,13 +89,13 @@ import {
                 gap: 2,
                 p: 1.5,
                 mb: 1,
-                bgcolor: "#242424",
+                bgcolor: "action.hover",
                 borderRadius: 2,
               }}
             >
               <Typography
                 sx={{
-                  color: "#a7a7a7",
+                  color: "text.secondary",
                   width: 20,
                   textAlign: "center",
                   flexShrink: 0,
@@ -105,8 +106,8 @@ import {
   
               <Avatar
                 sx={{
-                  bgcolor: "#303030",
-                  color: "#1ed760",
+                  bgcolor: "background.paper",
+                  color: "primary.main",
                   width: 44,
                   height: 44,
                 }}
@@ -120,13 +121,13 @@ import {
                 slotProps={{
                   primary: {
                     sx: {
-                      color: "white",
+                      color: "text.primary",
                       fontWeight: 600,
                     },
                   },
                   secondary: {
                     sx: {
-                      color: "#a7a7a7",
+                      color: "text.secondary",
                     },
                   },
                 }}
@@ -158,14 +159,14 @@ import {
           sx={{
             mt: 2,
             py: 1.5,
-            bgcolor: "#1ed760",
-            color: "#000",
+            bgcolor: "primary.main",
+            color: "primary.contrastText",
             fontWeight: 700,
             borderRadius: 3,
             textTransform: "none",
   
             "&:hover": {
-              bgcolor: "#1fdf64",
+              bgcolor: "primary.dark",
             },
           }}
         >

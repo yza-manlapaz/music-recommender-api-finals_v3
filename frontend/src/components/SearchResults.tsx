@@ -32,8 +32,9 @@ import {
         sx={{
           mt: 3,
           p: 3,
-          bgcolor: "#181818",
-          border: "1px solid #282828",
+          bgcolor: "background.paper",
+          border: "1px solid",
+          borderColor: "divider",
           borderRadius: 4,
         }}
       >
@@ -41,7 +42,7 @@ import {
           variant="h6"
           sx={{
             fontWeight: 700,
-            color: "white",
+            color: "text.primary",
             mb: 2,
           }}
         >
@@ -64,25 +65,25 @@ import {
                   borderRadius: 2,
                   mb: 1,
                   gap: 2,
-                  color: "white",
+                  color: "text.primary",
   
                   "&:hover": {
-                    bgcolor: "#282828",
+                    bgcolor: "#action.hover",
                   },
   
                   "&.Mui-selected": {
-                    bgcolor: "#23432e",
+                    bgcolor: "action.selected",
                   },
   
                   "&.Mui-selected:hover": {
-                    bgcolor: "#2b5238",
+                    bgcolor: "action.selected",
                   },
                 }}
               >
                 <Avatar
                   sx={{
-                    bgcolor: "#303030",
-                    color: "#1ed760",
+                    bgcolor: "action.hover",
+                    color: "primary.main",
                     width: 44,
                     height: 44,
                     fontSize: 22,
@@ -98,12 +99,12 @@ import {
                         primary: {
                         sx: {
                             fontWeight: 600,
-                            color: "white",
+                            color: "text.primary",
                         },
                         },
                         secondary: {
                         sx: {
-                            color: "#a7a7a7",
+                            color: "text.secondary",
                         },
                         },
                     }}
@@ -122,8 +123,8 @@ import {
                     label={song.genre}
                     size="small"
                     sx={{
-                      bgcolor: "#303030",
-                      color: "#d0d0d0",
+                      bgcolor: "action.hover",
+                      color: "text.secondary",
                       display: {
                         xs: "none",
                         sm: "inline-flex",
@@ -134,7 +135,7 @@ import {
                   <Typography
                     variant="caption"
                     sx={{
-                      color: "#a7a7a7",
+                      color: "text.secondary",
                       display: {
                         xs: "none",
                         md: "block",
