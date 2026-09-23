@@ -3,6 +3,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
+from rapidfuzz import fuzz, process
+
 from drf_spectacular.utils import (
     extend_schema,
     OpenApiParameter,
@@ -15,6 +17,23 @@ from recommender.runtime_recommend import (
 )
 
 from recommender.load import runtime_metadata
+
+#prep song and artist names for fuzzy search
+fuzzy_track_names = (
+    runtime_metadata["track_name"]
+    .dropna()
+    .astype(str)
+    .drop_duplicates()
+    .tolist()
+)
+
+fuzzy_artist_names = (
+    runtime_metadata["artist_name"]
+    .dropna()
+    .astype(str)
+    .drop_duplicates()
+    .tolist()
+)
 
 @extend_schema(
     summary="Recommend songs",
@@ -230,6 +249,7 @@ def search_songs(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+    #normal search substring
     matches = runtime_metadata[
         runtime_metadata["track_name"]
         .astype(str)
@@ -250,11 +270,100 @@ def search_songs(request):
         )
     ].copy()
 
-    #put popular songs first in search
-    matches = matches.sort_values(
-        by="popularity",
-        ascending=False,
-    ).head(20)
+    #fuzzy search if normal doesnt find anything
+    if matches.empty:
+        # Fuzzy match song titles
+        track_matches = process.extract(
+            query,
+            fuzzy_track_names,
+            scorer=fuzz.ratio,
+            limit=20,
+            score_cutoff=60,
+        )
+
+        # Fuzzy match artist names
+        artist_matches = process.extract(
+            query,
+            fuzzy_artist_names,
+            scorer=fuzz.ratio,
+            limit=20,
+            score_cutoff=60,
+        )
+
+        best_track_score = (
+            track_matches[0][1]
+            if track_matches
+            else 0
+        )
+
+        best_artist_score = (
+            artist_matches[0][1]
+            if artist_matches
+            else 0
+        )
+
+        # Decide whether the query looks more like
+        # a song title or an artist name.
+        if best_track_score >= best_artist_score:
+            # Treat query primarily as a song-title search
+            track_scores = {
+                result[0]: result[1]
+                for result in track_matches
+            }
+
+            matched_track_names = list(
+                track_scores.keys()
+            )
+
+            matches = runtime_metadata[
+                runtime_metadata["track_name"].isin(
+                    matched_track_names
+                )
+            ].copy()
+
+            matches["fuzzy_score"] = (
+                matches["track_name"]
+                .map(track_scores)
+                .fillna(0)
+            )
+
+        else:
+            # Treat query primarily as an artist search
+            artist_scores = {
+                result[0]: result[1]
+                for result in artist_matches
+            }
+
+            matched_artist_names = list(
+                artist_scores.keys()
+            )
+
+            matches = runtime_metadata[
+                runtime_metadata["artist_name"].isin(
+                    matched_artist_names
+                )
+            ].copy()
+
+            matches["fuzzy_score"] = (
+                matches["artist_name"]
+                .map(artist_scores)
+                .fillna(0)
+            )
+
+        # Similarity is most important.
+        # Popularity is only used as a tie-breaker.
+        matches = matches.sort_values(
+            by=["fuzzy_score", "popularity"],
+            ascending=[False, False],
+        ).head(20)
+
+    else:
+        # Exact/substring searches keep their
+        # existing popularity ranking.
+        matches = matches.sort_values(
+            by="popularity",
+            ascending=False,
+        ).head(20)
 
     results = []
 
