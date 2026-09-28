@@ -139,24 +139,7 @@ Final Project_v3/
 
 ## Model Artifacts
 
-The large recommender artifacts are intentionally excluded from GitHub because of repository file-size limits.
-
-The following files are required for the recommender to run:
-
-```text
-continuous_scaler.pkl
-X_continuous.npy
-popularity_normalized.npy
-song_metadata.pkl
-```
-
-Place them inside:
-
-```text
-backend/models/content_based/
-```
-
-The folder should contain:
+The following model artefacts are required for the recommender to run:
 
 ```text
 backend/models/content_based/
@@ -167,7 +150,6 @@ backend/models/content_based/
 └── model_config.json
 ```
 
-`model_config.json` is included in the repository.
 
 ## Backend Setup
 
