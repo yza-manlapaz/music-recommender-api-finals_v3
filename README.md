@@ -1,6 +1,6 @@
 # Music Recommendation System
 
-A full-stack content-based music recommendation web application built with Django REST Framework and React.
+A content-based music recommendation web application built with Django REST Framework and React.
 
 The system allows users to search for songs or artists and receive recommended songs based on audio-feature similarity, genre compatibility, key, mode, and popularity reranking.
 
