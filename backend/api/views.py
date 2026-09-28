@@ -140,7 +140,6 @@ def recommend_batch(request):
 
     track_ids = request.data.get("track_ids")
 
-    # track_ids must be a list
     if not isinstance(track_ids, list):
         return Response(
             {
@@ -149,7 +148,6 @@ def recommend_batch(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # require between 1 and 10 songs
     if len(track_ids) < 1 or len(track_ids) > 10:
         return Response(
             {
@@ -160,10 +158,8 @@ def recommend_batch(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # remove duplicate track IDs
     track_ids = list(dict.fromkeys(track_ids))
 
-    # verify every track exists
     selected_tracks = []
 
     for track_id in track_ids:
@@ -192,7 +188,6 @@ def recommend_batch(request):
             "popularity": int(row["popularity"]),
         })
 
-    # generate recommendations
     results = runtime_recommend_batch(
         track_ids=track_ids,
         top_n=10,
@@ -249,7 +244,6 @@ def search_songs(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    #normal search substring
     matches = runtime_metadata[
         runtime_metadata["track_name"]
         .astype(str)
@@ -270,9 +264,8 @@ def search_songs(request):
         )
     ].copy()
 
-    #fuzzy search if normal doesnt find anything
     if matches.empty:
-        # Fuzzy match song titles
+        
         track_matches = process.extract(
             query,
             fuzzy_track_names,
@@ -281,7 +274,7 @@ def search_songs(request):
             score_cutoff=60,
         )
 
-        # Fuzzy match artist names
+        
         artist_matches = process.extract(
             query,
             fuzzy_artist_names,
@@ -302,10 +295,9 @@ def search_songs(request):
             else 0
         )
 
-        # Decide whether the query looks more like
-        # a song title or an artist name.
+
         if best_track_score >= best_artist_score:
-            # Treat query primarily as a song-title search
+
             track_scores = {
                 result[0]: result[1]
                 for result in track_matches
@@ -328,7 +320,7 @@ def search_songs(request):
             )
 
         else:
-            # Treat query primarily as an artist search
+           
             artist_scores = {
                 result[0]: result[1]
                 for result in artist_matches
@@ -350,16 +342,12 @@ def search_songs(request):
                 .fillna(0)
             )
 
-        # Similarity is most important.
-        # Popularity is only used as a tie-breaker.
         matches = matches.sort_values(
             by=["fuzzy_score", "popularity"],
             ascending=[False, False],
         ).head(20)
 
     else:
-        # Exact/substring searches keep their
-        # existing popularity ranking.
         matches = matches.sort_values(
             by="popularity",
             ascending=False,

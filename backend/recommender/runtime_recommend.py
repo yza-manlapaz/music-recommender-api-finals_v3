@@ -12,7 +12,6 @@ from recommender.load import (
 
 def runtime_recommend(track_id, top_n=10):
     
-    # find query song using lookup table dictionary
     song_idx = runtime_track_lookup.get(track_id)
 
     if song_idx is None:
@@ -27,14 +26,14 @@ def runtime_recommend(track_id, top_n=10):
     query_title = str(query_row["track_name"]).strip().lower()
     query_artist = str(query_row["artist_name"]).strip().lower()
 
-    # find all genre families that contain the query genre
+
     compatible_genres = {query_genre}
 
     for genres in runtime_genre_families.values():
         if query_genre in genres:
             compatible_genres.update(genres)
 
-    # get candidate songs from compatible genres
+
     genre_array = runtime_metadata["genre"].to_numpy()
 
     candidate_indices = np.flatnonzero(
@@ -44,12 +43,11 @@ def runtime_recommend(track_id, top_n=10):
         )
     )
 
-    # remove the query song itself
+
     candidate_indices = candidate_indices[
         candidate_indices != song_idx
     ]
 
-    # remove exact duplicate versions
     candidate_metadata = runtime_metadata.iloc[
         candidate_indices
     ]
@@ -80,7 +78,7 @@ def runtime_recommend(track_id, top_n=10):
         ~duplicate_mask
     ]
 
-    # calculate audio features euclidean distance
+
     query_vector = runtime_X[song_idx]
 
     candidate_vectors = runtime_X[
@@ -92,7 +90,7 @@ def runtime_recommend(track_id, top_n=10):
         axis=1,
     )
 
-    # calculate key distance
+
     candidate_keys = (
         runtime_metadata.iloc[candidate_indices]["key"]
         .to_numpy(dtype=np.float32)
@@ -120,7 +118,6 @@ def runtime_recommend(track_id, top_n=10):
 
     key_distance = raw_key_distance / 2.0
 
-    # calculate mode difference
     candidate_modes = (
         runtime_metadata.iloc[candidate_indices]["mode"]
         .to_numpy(dtype=np.float32)
@@ -130,21 +127,21 @@ def runtime_recommend(track_id, top_n=10):
         candidate_modes - query_mode
     )
 
-    # check model weights from config
+  
     weights = runtime_config["weights"]
 
     key_weight = weights["key_weight"]
     mode_weight = weights["mode_weight"]
     popularity_weight = weights["popularity_weight"]
 
-    # add audio + key + mode
+
     music_distance = (
         audio_distance
         + key_weight * key_distance
         + mode_weight * mode_difference
     )
 
-    # rerank based on opularity
+  
     candidate_popularity = runtime_popularity[
         candidate_indices
     ]
@@ -159,7 +156,7 @@ def runtime_recommend(track_id, top_n=10):
         - popularity_bonus
     )
 
-    # get the best recommendations
+
     number_to_return = min(
         top_n,
         len(candidate_indices),
@@ -173,7 +170,7 @@ def runtime_recommend(track_id, top_n=10):
         number_to_return - 1,
     )[:number_to_return]
 
-    # sort the selected songs by final score
+   
     top_positions = top_positions[
         np.argsort(
             final_score[top_positions]
@@ -184,7 +181,7 @@ def runtime_recommend(track_id, top_n=10):
         top_positions
     ]
 
-    # 12. Create result dataframe
+   
     results = runtime_metadata.iloc[
         top_indices
     ].copy()
@@ -210,11 +207,11 @@ def runtime_recommend(track_id, top_n=10):
 
 def runtime_recommend_batch(track_ids, top_n=10):
 
-    # only accept between 1 and 10 selected songs
+  
     if not track_ids or len(track_ids) > 10:
         return None
 
-    # convert track IDs into row indices
+   
     selected_indices = []
 
     for track_id in track_ids:
@@ -225,19 +222,18 @@ def runtime_recommend_batch(track_ids, top_n=10):
 
         selected_indices.append(song_idx)
 
-    # remove duplicate selections while preserving order
+   
     selected_indices = list(dict.fromkeys(selected_indices))
 
-    # get the standardized audio vectors of selected songs
+ 
     selected_vectors = runtime_X[selected_indices]
 
-    # create one combined preference vector
+ 
     query_vector = np.mean(
         selected_vectors,
         axis=0,
     )
 
-    # collect genres compatible with ALL selected songs
     compatible_genres = set()
 
     for song_idx in selected_indices:
@@ -250,7 +246,7 @@ def runtime_recommend_batch(track_ids, top_n=10):
             if query_genre in genres:
                 compatible_genres.update(genres)
 
-    # get candidate songs belonging to compatible genres
+
     genre_array = runtime_metadata["genre"].to_numpy()
 
     candidate_indices = np.flatnonzero(
@@ -260,7 +256,7 @@ def runtime_recommend_batch(track_ids, top_n=10):
         )
     )
 
-    # remove every selected song from the candidates
+
     candidate_indices = candidate_indices[
         ~np.isin(
             candidate_indices,
@@ -268,7 +264,7 @@ def runtime_recommend_batch(track_ids, top_n=10):
         )
     ]
 
-    # calculate Euclidean distance from combined audio vector
+
     candidate_vectors = runtime_X[
         candidate_indices
     ]
@@ -278,23 +274,23 @@ def runtime_recommend_batch(track_ids, top_n=10):
         axis=1,
     )
 
-    # get popularity
+ 
     candidate_popularity = runtime_popularity[
         candidate_indices
     ]
 
-    # get popularity weight from configuration
+ 
     popularity_weight = runtime_config[
         "weights"
     ]["popularity_weight"]
 
-    # final batch score
+  
     final_score = (
         audio_distance
         - popularity_weight * candidate_popularity
     )
 
-    # determine number of recommendations
+
     number_to_return = min(
         top_n,
         len(candidate_indices),
@@ -303,13 +299,13 @@ def runtime_recommend_batch(track_ids, top_n=10):
     if number_to_return == 0:
         return runtime_metadata.iloc[[]].copy()
 
-    # find songs with lowest final scores
+ 
     top_positions = np.argpartition(
         final_score,
         number_to_return - 1,
     )[:number_to_return]
 
-    # sort selected recommendations properly
+
     top_positions = top_positions[
         np.argsort(
             final_score[top_positions]
@@ -320,7 +316,6 @@ def runtime_recommend_batch(track_ids, top_n=10):
         top_positions
     ]
 
-    # create result dataframe
     results = runtime_metadata.iloc[
         top_indices
     ].copy()

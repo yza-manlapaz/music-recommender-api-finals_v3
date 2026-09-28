@@ -9,9 +9,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 MODEL_DIR = BASE_DIR / "models" / "content_based"
 
-# ==========================================
-# load saved model artifacts
-# ==========================================
 
 runtime_scaler = joblib.load(
     MODEL_DIR / "continuous_scaler.pkl"
@@ -37,19 +34,12 @@ with open(
     runtime_config = json.load(file)
 
 
-# ==========================================
-# set genre families
-# ==========================================
-
 runtime_genre_families = {
     family: set(genres)
     for family, genres
     in runtime_config["genre_families"].items()
 }
 
-# ==========================================
-# make track lookup dictionary
-# ==========================================
 
 runtime_track_lookup = {
     track_id: idx
@@ -58,20 +48,3 @@ runtime_track_lookup = {
         runtime_metadata["track_id"].to_numpy()
     )
 }
-
-# ==========================================
-# checker
-# ==========================================
-
-# print("Model artifacts loaded successfully.")
-# print("Feature matrix:", runtime_X.shape)
-# print("Metadata:", runtime_metadata.shape)
-# print("Popularity:", runtime_popularity.shape)
-# print(
-#     "Genre families:",
-#     list(runtime_genre_families.keys())
-# )
-# print(
-#     "Track lookup entries:",
-#     len(runtime_track_lookup)
-# )

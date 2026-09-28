@@ -50,12 +50,10 @@ function App() {
   };
 
   const handleSelectSong = (song: Song) => {
-    // prevent more than 10 songs
     if (selectedSongs.length >= 10) {
       return;
     }
   
-    // prevent selecting the same song twice
     const alreadySelected = selectedSongs.some(
       (selected) => selected.track_id === song.track_id
     );
@@ -69,12 +67,11 @@ function App() {
       song,
     ]);
   
-    // hide search results after selection
+
     setSongs([]);
     setQuery("");
   
-    // old recommendations are no longer based
-    // on the current selection
+
     setRecommendations([]);
   };
 
