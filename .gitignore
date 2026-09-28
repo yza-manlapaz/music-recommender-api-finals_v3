@@ -18,8 +18,8 @@ backend/media/
 # =========================
 # Recommender Model artifacts
 # =========================
-backend/models/content_based/*.pkl
-backend/models/content_based/*.npy
+# backend/models/content_based/*.pkl
+# backend/models/content_based/*.npy
 
 # Keep model configuration
 !backend/models/content_based/model_config.json
